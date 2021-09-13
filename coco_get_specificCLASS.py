@@ -77,7 +77,7 @@ img_dir=savepath+'images/'
 anno_dir=savepath+'annotations/' #++
 # datasets_list=['train2014', 'val2014'] 
 # datasets_list=['patch29','patch30','patch31','patch32','patch33','patch34','patch35', 'patch36','patch37','patch40'] #++
-datasets_list=['patch0','patch1'] #++
+datasets_list=['patch0','patch5'] #++
 classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Tablet"]  #coco有80类，这里写要提取类的名字，以person为例 #++
 # classes_names = ["Bus","Car"]
 # classes_names = ["Glasses","Person","Street Lights","Umbrella"]
@@ -128,18 +128,7 @@ objstr = """\
 tailstr = '''\
 </annotation>
 '''
- 
-#if the dir is not exists,make it,else delete it
-# def mkr(path):
-#     if os.path.exists(path):
-#         shutil.rmtree(path)
-#         os.mkdir(path)
-#     else:
-#         os.mkdir(path)
-# mkr(img_dir)
-# mkr(anno_dir)
 
-# if the dir is not exists,make it,else delete it
 def mkr(path):
     path=Path(path)
     if Path.exists(path):
@@ -167,9 +156,6 @@ def write_xml(anno_path,head, objs, tail):
 def save_annotations_and_imgs(coco,dataset,filename,objs):
     #eg:COCO_train2014_000000196610.jpg-->COCO_train2014_000000196610.xml
     
-    # anno_path=anno_dir+filename[:-3]+'xml'
-    # img_path=dataDir+dataset+'/'+filename
-
     anno_path=anno_dir+filename[:-3]+'xml'
     img_path=dataDir+'images/'+dataset+'/'+filename
 
@@ -177,35 +163,26 @@ def save_annotations_and_imgs(coco,dataset,filename,objs):
     dst_imgpath=img_dir+filename
  
     img=cv2.imread(img_path)
-    #if (img.shape[2] == 1):
-    #    print(filename + " not a RGB image")
-     #   return
-    shutil.copy(img_path, dst_imgpath)
- 
+    shutil.copy(img_path, dst_imgpath)#複製貼上影像
+    #write VOC format by *.xml
     head=headstr % (filename, img.shape[1], img.shape[0], img.shape[2])
     tail = tailstr
     write_xml(anno_path,head, objs, tail)
  
  
-def showimg(coco,dataset,img,classes,cls_id,filename,show=True):
+def annotations_img(coco,dataset,img,classes,cls_id,filename):
     global dataDir
 
-    # I=Image.open('%s/%s/%s'%(dataDir,dataset,img['file_name']))
-    # I=Image.open(dataDir+'images/'+dataset+'/'+img['file_name'])
-    # I=Image.open(dataDir+'images/'+dataset+'/'+filename)
-    #通过id，得到注释的信息
+    #由ID得到標註資料
     # annIds = coco.getAnnIds(imgIds=img['id'], catIds=cls_id, iscrowd=None)
     annIds = coco.getAnnIds(imgIds=img['id'], iscrowd=0) #obj365
-    # print(annIds)
     anns = coco.loadAnns(annIds)
-    saveBBOX = False
-    # print(anns)
     # coco.showAnns(anns)
     objs = []
     for ann in anns:
         class_name=classes[ann['category_id']]
         BBarea = ann['area']
-        if class_name in classes_names and BBarea>200 :
+        if class_name in classes_names and BBarea>500 :
             print(class_name)
             if 'bbox' in ann:
                 bbox=ann['bbox']
@@ -216,16 +193,9 @@ def showimg(coco,dataset,img,classes,cls_id,filename,show=True):
                 obj = [class_name, xmin, ymin, xmax, ymax]
                 objs.append(obj)
                 
-                # draw = ImageDraw.Draw(I) #++不用畫阿
-                # draw.rectangle([xmin, ymin, xmax, ymax])
-                
+
     if not objs == []: #非空BBOX才存XML與IMG
         save_annotations_and_imgs(coco, dataset, filename, objs)
-    if show:
-        plt.figure()
-        plt.axis('off')
-        # plt.imshow(I)
-        plt.show()
 
  
     return objs
@@ -252,7 +222,7 @@ for dataset in datasets_list: #在images/中有幾包影像
     for i in p.iterdir(): file_name_list.append(i.name)
     # print(file_name_list)
 
-    #[1, 2, 3, 4, 6, 8]
+    #[1, 2, 3, 4, 6, 8] classID清單
     classes_ids = coco.getCatIds(catNms=classes_names) 
     print("classesID",classes_ids)
     for cls in classes_names: #一個個 cls去找
@@ -260,19 +230,18 @@ for dataset in datasets_list: #在images/中有幾包影像
         cls_id=coco.getCatIds(catNms=[cls])
         img_ids=coco.getImgIds(catIds=cls_id)
         print(cls,len(img_ids))
-        # imgIds=img_ids[0:10]
-        count=0
+        # count=0
         for imgId in tqdm(img_ids):
             img = coco.loadImgs(imgId)[0]
             # filename = img['file_name']
             filename = Path(img['file_name']).name #obej 365
             if filename in file_name_list:
-                count=count+1
+                # count=count+1
                 # print(filename)
-                objs=showimg(coco, dataset, img, classes,classes_ids,filename,show=False)
+                objs=annotations_img(coco, dataset, img, classes,classes_ids,filename)
                 print(objs)
                 # save_annotations_and_imgs(coco, dataset, filename, objs)
-        print(count)
+        # print(count)
             
             
             
