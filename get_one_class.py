@@ -27,7 +27,7 @@ with open('class_id_Customized.csv') as csvFile:
     data = list(csvReader)
 
 cid,keys=np.array([]),np.array([])
-for index in data[1:]:
+for index in data[1:]: #最上面['', 'name', 'AnnsName']不要
     for name in index[2].split(","):
         keys=np.append(keys,name)
         cid=np.append(cid,index[0])
@@ -42,11 +42,11 @@ anno_dir=savepath+'labels/' #++
 # datasets_list=['train2014', 'val2014'] 
 # datasets_list=['patch29','patch30','patch31','patch32','patch33','patch34','patch35', 'patch36','patch37','patch40'] #++
 # datasets_list=['patch0','patch5'] #++
-# classes_names = ["Toothbrush"]  #coco有80类，这里写要提取类的名字，以person为例 #++
-classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Tablet"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+classes_names = ["Toothbrush"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+# classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Tablet"]  #coco有80类，这里写要提取类的名字，以person为例 #++
 # classes_names = ["Bus","Car"]
 # classes_names = ["Person"]
-# classes_names = ["Glasses","Person","Street Lights","Umbrella"]
+# classes_names = ["Dinning Table","Coffee Table","Side Table","Tablet"]
 #Store annotations and train2014/val2014/... in this folder
 dataDir= 'Objects365/'  #原coco数据集 #++
 
@@ -107,20 +107,20 @@ def id2name(coco):
     return classes
  
 def write_xml(anno_path,head, objs, tail):
-    f = open(anno_path, "w")
-    f.write(head)
-    for obj in objs:
-        f.write(objstr%(obj[0],obj[1],obj[2],obj[3],obj[4]))
-    f.write(tail)
+    with open(anno_path, "w") as f:
+        f.write(head)
+        for obj in objs:
+            f.write(objstr%(obj[0],obj[1],obj[2],(obj[3]+obj[1]),(obj[4]+obj[2])))
+        f.write(tail)
 
 def write_txt(anno_path , objs ,width ,height):
-    f = open(anno_path, "w")
-    for obj in objs:
-        y_id=cid[np.where(keys == obj[0])[0][0]]
-        #x, y, w, h = a['bbox']  >>>obj[1],obj[2],obj[3],obj[4]
-        xc, yc = obj[1] + obj[3] / 2, obj[2] + obj[4] / 2  # xy to center
-        #參考 file.write(f"{cid} {x / width:.5f} {y / height:.5f} {w / width:.5f} {h / height:.5f}\n")
-        f.write(f"{y_id} {xc / width:.5f} {yc / height:.5f} {obj[3] / width:.5f} {obj[4]/ height:.5f}\n")
+    with open(anno_path, "w") as f:
+        for obj in objs:
+            y_id=cid[np.where(keys == obj[0])[0][0]]
+            #x, y, w, h = a['bbox']  >>>obj[1],obj[2],obj[3],obj[4]
+            xc, yc = obj[1] + obj[3] / 2, obj[2] + obj[4] / 2  # xy to center
+            #參考 file.write(f"{cid} {x / width:.5f} {y / height:.5f} {w / width:.5f} {h / height:.5f}\n")
+            f.write(f"{y_id} {xc / width:.5f} {yc / height:.5f} {obj[3] / width:.5f} {obj[4]/ height:.5f}\n")
  
 def save_annotations_and_imgs_xml(coco,dataset,filename,objs,width ,height):
     #eg:COCO_train2014_000000196610.jpg-->COCO_train2014_000000196610.xml
@@ -157,23 +157,31 @@ def annotations_img(coco,dataset,img,classes,cls_id,filename):
 
     #由ID得到標註資料
     # annIds = coco.getAnnIds(imgIds=img['id'], catIds=cls_id, iscrowd=None)
-    annIds = coco.getAnnIds(imgIds=img['id'], iscrowd=0) #obj365
-    anns = coco.loadAnns(annIds)
-    width, height = img["width"], img["height"]
-    # coco.showAnns(anns)
-    objs = []
-    for ann in anns:
-        class_name=classes[ann['category_id']]
-        BBarea = ann['area']
-        if class_name in classes_names and BBarea>10 :
-            x, y, w, h = ann['bbox']  # bounding box in xywh (xy top-left corner)
-            obj = [class_name, x, y, w, h]
-            objs.append(obj)
-                
+    annIds = coco.getAnnIds(imgIds=img['id'], iscrowd=1) #obj365
+    annsiscrowd = coco.loadAnns(annIds)
+    if len(annsiscrowd) == 0 :  #此圖沒有任何有corwd的標註
+        annIds = coco.getAnnIds(imgIds=img['id'], iscrowd=0) #obj365
+        anns = coco.loadAnns(annIds)
+        AreaOK = 0 #準備紀錄面積OK的標註
+        ann_cls = 0 #針對要擷取的標註計算
+        width, height = img["width"], img["height"]
+        # coco.showAnns(anns)
+        objs = []
+        for ann in anns:
+            class_name=classes[ann['category_id']]
+            AreaRatio=ann['area'] / (width*height)
+            if class_name in classes_names:
+                ann_cls += 1 #符合要得類別計數
+                if AreaRatio > 0.005 and AreaRatio < 0.9  : # AR>5% and AR<90%
+                    AreaOK += 1 #面積也符合
+                    x, y, w, h = ann['bbox']  # bounding box in xywh (xy top-left corner)
+                    obj = [class_name, x, y, w, h]
+                    objs.append(obj)
+                    
 
-    if not objs == []: #非空BBOX才存XML與IMG
-        save_annotations_and_imgs(coco, dataset, filename, objs ,width ,height)
-    return objs
+        if not objs == [] and (AreaOK/ann_cls>0.3): #非空BBOX才存XML與IMG 且不能太多小的照片(2成)
+            save_annotations_and_imgs(coco, dataset, filename, objs ,width ,height)
+        return objs
 
 #%%
 #---file process----
@@ -196,7 +204,7 @@ print("classes",classes)
 classes_ids = coco.getCatIds(catNms=classes_names)
 print("classesID",classes_ids)
 #%% main
-#-----製作任何有牙刷類別的清單ImgID
+#-----main---製作任何有牙刷類別的清單ImgID
 cls="Toothbrush"
 cls_id=coco.getCatIds(catNms=[cls])
 img_ids=coco.getImgIds(catIds=cls_id)
@@ -222,4 +230,9 @@ for imgId in tqdm(img_ids): #依照全部符合cls的ImgID一張張跑
             
 
 
+# %%建立給labelimg看的檔案
+#create classes.txt
+with open(anno_dir+"classes.txt","w") as file:
+    for i in data[1:]:
+        file.write(f"{i[1]}\n")
 # %%
