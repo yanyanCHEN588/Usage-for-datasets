@@ -35,15 +35,15 @@ for index in data[1:]: #最上面['', 'name', 'AnnsName']不要
 #%%json coco
 ###-----------config----------
 #the path you want to save your results for coco to voc
-savepath="Toothbrsh_txt/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
+savepath="Toothbrsh_Obj365/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
 labelformat = 'txt'
 img_dir=savepath+'images/' 
 anno_dir=savepath+'labels/' #++
 # datasets_list=['train2014', 'val2014'] 
 # datasets_list=['patch29','patch30','patch31','patch32','patch33','patch34','patch35', 'patch36','patch37','patch40'] #++
 # datasets_list=['patch0','patch5'] #++
-classes_names = ["Toothbrush"]  #coco有80类，这里写要提取类的名字，以person为例 #++
-# classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Tablet"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+# classes_names = ["Toothbrush"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Dinning Table","Coffee Table","Side Table"]  #coco有80类，这里写要提取类的名字，以person为例 #++
 # classes_names = ["Bus","Car"]
 # classes_names = ["Person"]
 # classes_names = ["Dinning Table","Coffee Table","Side Table","Tablet"]
@@ -172,7 +172,7 @@ def annotations_img(coco,dataset,img,classes,cls_id,filename):
             AreaRatio=ann['area'] / (width*height)
             if class_name in classes_names:
                 ann_cls += 1 #符合要得類別計數
-                if AreaRatio > 0.005 and AreaRatio < 0.9  : # AR>5% and AR<90%
+                if AreaRatio > 0.005 and AreaRatio < 0.9  : # AR>0.5% and AR<90%
                     AreaOK += 1 #面積也符合
                     x, y, w, h = ann['bbox']  # bounding box in xywh (xy top-left corner)
                     obj = [class_name, x, y, w, h]
@@ -235,4 +235,15 @@ for imgId in tqdm(img_ids): #依照全部符合cls的ImgID一張張跑
 with open(anno_dir+"classes.txt","w") as file:
     for i in data[1:]:
         file.write(f"{i[1]}\n")
+# %%create ALL file list
+#創建目前所產生的清單
+#先用照片當用程式自動篩選出來的清單全部
+create_list=[]
+for i in Path(img_dir).iterdir():
+    create_list.append(i.name)
+savetxt_name="ALL_{}_len_{}.txt".format(cls,len(create_list))
+with open(savepath+savetxt_name,"w") as file:
+    for i in create_list:
+        file.write(f"{i}\n")
+
 # %%

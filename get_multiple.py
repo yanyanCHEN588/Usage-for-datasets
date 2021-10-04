@@ -9,6 +9,9 @@
 Object365共有四種桌子 "Dinning Table","Coffee Table","Side Table","Tablet"
 跑他們各類別前10張就好
 
+10/04 ++
+可以看想要知道的各類別前10張以XML顯示
+
 """
 #%% load module
 from pycocotools.coco import COCO
@@ -37,7 +40,7 @@ for index in data[1:]:
 #%%json coco
 ###-----------config----------
 #the path you want to save your results for coco to voc
-savepath="Table_mul/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
+savepath="Desk/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
 labelformat = 'xml'
 img_dir=savepath+'images/' 
 anno_dir=savepath+'labels/' #++
@@ -48,7 +51,7 @@ anno_dir=savepath+'labels/' #++
 # classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Tablet"]  #coco有80类，这里写要提取类的名字，以person为例 #++
 # classes_names = ["Bus","Car"]
 # classes_names = ["Person"]
-classes_names = ["Dinning Table","Coffee Table","Side Table","Tablet"]
+classes_names = ["Desk"]
 #Store annotations and train2014/val2014/... in this folder
 dataDir= 'Objects365/'  #原coco数据集 #++
 
@@ -166,8 +169,7 @@ def annotations_img(coco,dataset,img,classes,cls_id,filename):
     objs = []
     for ann in anns:
         class_name=classes[ann['category_id']]
-        BBarea = ann['area']
-        if class_name in classes_names and BBarea>10 :
+        if class_name in classes_names :
             x, y, w, h = ann['bbox']  # bounding box in xywh (xy top-left corner)
             obj = [class_name, x, y, w, h]
             objs.append(obj)
@@ -199,7 +201,7 @@ classes_ids = coco.getCatIds(catNms=classes_names)
 print("classesID",classes_ids)
 #%% --------------------------------main---------------------------
 #-----main---製作任何有牙刷類別的清單ImgID
-cls_mul=["Dinning Table","Coffee Table","Side Table","Tablet"]
+cls_mul=classes_names
 for cls in cls_mul:
     cls_id=coco.getCatIds(catNms=[cls])
     img_ids=coco.getImgIds(catIds=cls_id)[:10]
