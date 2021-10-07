@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-2021-09-27
+2021-10-07
 @author: yan
 
 使用類別名稱讀出想要的類別並且紀錄ImgID
@@ -43,7 +43,7 @@ anno_dir=savepath+'labels/' #++
 # datasets_list=['patch29','patch30','patch31','patch32','patch33','patch34','patch35', 'patch36','patch37','patch40'] #++
 # datasets_list=['patch0','patch5'] #++
 # classes_names = ["Toothbrush"]  #coco有80类，这里写要提取类的名字，以person为例 #++
-classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Dinning Table","Coffee Table","Side Table"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Dinning Table","Coffee Table","Side Table","Desk"]  #coco有80类，这里写要提取类的名字，以person为例 #++
 # classes_names = ["Bus","Car"]
 # classes_names = ["Person"]
 # classes_names = ["Dinning Table","Coffee Table","Side Table","Tablet"]
@@ -172,7 +172,7 @@ def annotations_img(coco,dataset,img,classes,cls_id,filename):
             AreaRatio=ann['area'] / (width*height)
             if class_name in classes_names:
                 ann_cls += 1 #符合要得類別計數
-                if AreaRatio > 0.005 and AreaRatio < 0.9  : # AR>0.5% and AR<90%
+                if AreaRatio > 0.001 and AreaRatio < 0.9  : # AR>0.5% and AR<90%
                     AreaOK += 1 #面積也符合
                     x, y, w, h = ann['bbox']  # bounding box in xywh (xy top-left corner)
                     obj = [class_name, x, y, w, h]

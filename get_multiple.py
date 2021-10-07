@@ -4,6 +4,7 @@
 @author: yan
 
 可以指定看想要的類別前10張的標註狀況
+以XML展示
 
 09/30++
 Object365共有四種桌子 "Dinning Table","Coffee Table","Side Table","Tablet"
@@ -11,6 +12,8 @@ Object365共有四種桌子 "Dinning Table","Coffee Table","Side Table","Tablet"
 
 10/04 ++
 可以看想要知道的各類別前10張以XML顯示
+
+
 
 """
 #%% load module
@@ -51,7 +54,7 @@ anno_dir=savepath+'labels/' #++
 # classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Tablet"]  #coco有80类，这里写要提取类的名字，以person为例 #++
 # classes_names = ["Bus","Car"]
 # classes_names = ["Person"]
-classes_names = ["Desk"]
+classes_names = ["Desk","Dinning Table","Coffee Table","Side Table","Tablet"]
 #Store annotations and train2014/val2014/... in this folder
 dataDir= 'Objects365/'  #原coco数据集 #++
 
