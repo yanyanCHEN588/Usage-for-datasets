@@ -2,7 +2,7 @@
 """
 2021-10-07
 @author: yan
-
+刪除的過濾也寫好了
 使用類別名稱讀出想要的類別並且紀錄ImgID
 使用ImgID去讀取標註並存起來
     需要能夠擷取影像位置
@@ -35,21 +35,20 @@ for index in data[1:]: #最上面['', 'name', 'AnnsName']不要
 #%%json coco
 ###-----------config----------
 #the path you want to save your results for coco to voc
-savepath="Toothbrsh_Obj365/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
+savepath="pick_test/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
 labelformat = 'txt'
 img_dir=savepath+'images/' 
 anno_dir=savepath+'labels/' #++
 # datasets_list=['train2014', 'val2014'] 
 # datasets_list=['patch29','patch30','patch31','patch32','patch33','patch34','patch35', 'patch36','patch37','patch40'] #++
 # datasets_list=['patch0','patch5'] #++
-# classes_names = ["Toothbrush"]  #coco有80类，这里写要提取类的名字，以person为例 #++
-classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Dinning Table","Coffee Table","Side Table","Desk"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+classes_names = ["Toothbrush"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+# classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Dinning Table","Coffee Table","Side Table","Desk"]  #coco有80类，这里写要提取类的名字，以person为例 #++
 # classes_names = ["Bus","Car"]
 # classes_names = ["Person"]
 # classes_names = ["Dinning Table","Coffee Table","Side Table","Tablet"]
 #Store annotations and train2014/val2014/... in this folder
 dataDir= 'Objects365/'  #原coco数据集 #++
-
 ###-----------config----------
 headstr = """\
 <annotation>
@@ -188,7 +187,15 @@ def annotations_img(coco,dataset,img,classes,cls_id,filename):
 mkr(img_dir)
 mkr(anno_dir)
 
+# %%
+#刪除的不要的清單資料夾
+del_labelDir=Path("del_label")/'Toothbrush_EX/'
 
+nosave=[]
+if del_labelDir.exists(): #存在才執行以下，防呆用
+    for file in Path(del_labelDir).iterdir():
+        with open(file) as f:
+            nosave.extend(f.read().split('\n')[:-1])
 #%% load annotations
 #----load JSON-----LOAD一次就好，因為假設只有一個JSON檔案
 #./COCO/annotations/instances_train2014.json
@@ -207,7 +214,7 @@ print("classesID",classes_ids)
 #-----main---製作任何有牙刷類別的清單ImgID
 cls="Toothbrush"
 cls_id=coco.getCatIds(catNms=[cls])
-img_ids=coco.getImgIds(catIds=cls_id)
+img_ids=coco.getImgIds(catIds=cls_id) #後面有[:50] eg:取前50張
 
 for imgId in tqdm(img_ids): #依照全部符合cls的ImgID一張張跑
     """
@@ -220,15 +227,15 @@ for imgId in tqdm(img_ids): #依照全部符合cls的ImgID一張張跑
     # dataset 是在images/後的資料包與patch
     # coco = COCO(annFile)
     
-    img = coco.loadImgs(imgId)[0]
+    img = coco.loadImgs(imgId)[0] 
     filename_list=img['file_name'].split('/')
     filename = filename_list[-1] # eg: 'objects365_v2_02060288.jpg'
-    dataset = filename_list[2] #eg:  'patch45'
-    img_path=dataDir+'images/'+dataset
-    objs=annotations_img(coco, dataset, img, classes,classes_ids,filename)
+    if filename[:-4] not in nosave: #檔名(無副檔名)沒有在不可儲存的清單
+        dataset = filename_list[2] #eg:  'patch45'
+        img_path=dataDir+'images/'+dataset
+        objs=annotations_img(coco, dataset, img, classes,classes_ids,filename)
     # print(objs)
             
-
 
 # %%建立給labelimg看的檔案
 #create classes.txt
@@ -245,5 +252,6 @@ savetxt_name="ALL_{}_len_{}.txt".format(cls,len(create_list))
 with open(savepath+savetxt_name,"w") as file:
     for i in create_list:
         file.write(f"{i}\n")
+
 
 # %%
