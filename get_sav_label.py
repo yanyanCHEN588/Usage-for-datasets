@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-2021-10-07
+2021-10-11
 @author: yan
-刪除的過濾也寫好了
-使用類別名稱讀出想要的類別並且紀錄ImgID
-使用ImgID去讀取標註並存起來
-    需要能夠擷取影像位置
 
+由已經人力簡單過濾出SAV來去儲存LABEL
+############
+需要先準備
+/sav_label
+    /verion_1
+        SAV1.txt
+        SAV2.txt
+在這樣底下去搜尋version內所有SAV資料
+並儲存LABEL
+#############
 
 ##要調整得地方
 1.統合ID名單
@@ -39,7 +45,7 @@ from pathlib import Path
 #標註名稱轉換表
 import csv
 import numpy as np
-with open('class_id_Customized_copy.csv') as csvFile:
+with open('class_id_Customized_h15v1.csv') as csvFile:
     csvReader = csv.reader(csvFile)
     data = list(csvReader)
 
@@ -52,15 +58,15 @@ for index in data[1:]: #最上面['', 'name', 'AnnsName']不要
 #%%json coco
 ###-----------config----------
 #the path you want to save your results for coco to voc
-savepath="Microwave_Obj365/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
+savepath="object365_c15_v1/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
 labelformat = 'txt'
 img_dir=savepath+'images/' 
 anno_dir=savepath+'labels/' #++
 # datasets_list=['train2014', 'val2014'] 
 # datasets_list=['patch29','patch30','patch31','patch32','patch33','patch34','patch35', 'patch36','patch37','patch40'] #++
 # datasets_list=['patch0','patch5'] #++
-classes_names = ["Microwave"]  #coco有80类，这里写要提取类的名字，以person为例 #++
-# classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrellaz","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Dinning Table","Coffee Table","Side Table","Desk"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+# classes_names = ["Microwave"]  #coco有80类，这里写要提取类的名字，以person为例 #++
+classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrella","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Desk","Scissors","Fork"]
 # classes_names = ["Bus","Car"]
 # classes_names = ["Person"]
 # classes_names = ["Dinning Table","Coffee Table","Side Table","Tablet"]
@@ -133,6 +139,10 @@ def write_txt(anno_path , objs ,width ,height):
     with open(anno_path, "w") as f:
         for obj in objs:
             y_id=cid[np.where(keys == obj[0])[0][0]]
+            if obj[3] >width:
+                obj[3] =width
+            if obj[4] >height:
+                obj[4] =height
             #x, y, w, h = a['bbox']  >>>obj[1],obj[2],obj[3],obj[4]
             xc, yc = obj[1] + obj[3] / 2, obj[2] + obj[4] / 2  # xy to center
             #參考 file.write(f"{cid} {x / width:.5f} {y / height:.5f} {w / width:.5f} {h / height:.5f}\n")
@@ -205,14 +215,44 @@ mkr(img_dir)
 mkr(anno_dir)
 
 # %%
-#刪除的不要的清單資料夾
+#令list唯一
+def unique(list1):
+    # initialize a null list
+    unique_list = []
+    # traverse for all elements
+    for x in list1:
+        # check if exists in unique_list or not
+        if x not in unique_list:
+            unique_list.append(x)
+    return unique_list
+# %%
+#刪除的_不要的清單資料夾
 del_labelDir=Path("del_label")/'object365_c15_v1/'
 
-nosave=[]
+nosave=[] #不要儲存的list
 if del_labelDir.exists(): #存在才執行以下，防呆用
     for file in Path(del_labelDir).iterdir():
         with open(file) as f:
-            nosave.extend(f.read().split('\n')[:-1])
+            nosave.extend(f.read().split('\n')[:-1]) #>>>objects365_v1_00000702
+ 
+
+# %%ver_2021.10.11
+#SAV_指定要label的清單
+sav_labelDir=Path("sav_label")/'object365_c15_v1/'
+
+annotasave=[] #蒐集SAV儲存label的list
+if sav_labelDir.exists(): #存在才執行以下，防呆用
+    for file in Path(sav_labelDir).iterdir():
+        with open(file) as f:
+            annotasave.extend(f.read().split('\n')[:-1]) #>>>objects365_v1_00000702
+#使list獨立性(只會出現一次)
+uni_list = unique(annotasave)
+
+sav_list=[] #要送進讀取ID的清單
+for x in uni_list:
+        sav_list.append(int(x.split('_')[-1]))
+
+
 #%% load annotations
 #----load JSON-----LOAD一次就好，因為假設只有一個JSON檔案
 #./COCO/annotations/instances_train2014.json
@@ -229,11 +269,12 @@ classes_ids = coco.getCatIds(catNms=classes_names)
 print("classesID",classes_ids)
 #%% main
 #-----main---製作任何有牙刷類別的清單ImgID
-cls="Microwave"
-cls_id=coco.getCatIds(catNms=[cls])
-img_ids=coco.getImgIds(catIds=cls_id)[:4000] #後面有[:50] eg:取前50張
-
-for imgId in tqdm(img_ids): #依照全部符合cls的ImgID一張張跑
+# cls="Microwave"
+# cls_id=coco.getCatIds(catNms=[cls])
+# img_ids=coco.getImgIds(catIds=cls_id)[:4000] #後面有[:50] eg:取前50張
+#img_id是int type
+# sav_list=[490]
+for imgId in tqdm(sav_list): #依照全部符合cls的ImgID一張張跑
     """
     img['file_name'] >>> 'images/v2/patch45/objects365_v2_02060288.jpg'
     img['file_name'].split('/') >>> ['images', 'v2', 'patch45', 'objects365_v2_02060288.jpg']
@@ -264,12 +305,15 @@ with open(anno_dir+"classes.txt","w") as file:
 #先用照片當用程式自動篩選出來的清單全部
 create_list=[]
 # cls="Bowl"
+cls = "o365h15v1"
 for i in Path(img_dir).iterdir():
     create_list.append(i.name)
 savetxt_name="ALL_{}_len_{}.txt".format(cls,len(create_list))
 with open(savepath+savetxt_name,"w") as file:
     for i in create_list:
         file.write(f"{i}\n")
+
+
 
 
 # %%
