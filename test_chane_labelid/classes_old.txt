@@ -1,0 +1,16 @@
+Umbrella
+Bag
+Bottle
+Cup
+Fork
+Spoon
+Bowl
+Chair
+Table
+Remote
+Cell Phone
+Microwave
+Refrigerator
+Scissors
+Toothbrush
+Extension-block
