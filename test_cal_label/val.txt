@@ -1,0 +1,9 @@
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000154.jpg
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000285.jpg
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000658.jpg
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000824.jpg
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000665.jpg
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000535.jpg
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000401.jpg
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000777.jpg
+D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000826.jpg

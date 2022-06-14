@@ -1,0 +1,17 @@
+Umbrella
+Bag
+Bottle
+Cup
+Fork
+Spoon
+Bowl
+Chair
+Remote
+Cell Phone
+Microwave
+Refrigerator
+Extension-block
+Moniter
+Mouse
+Keyboard
+Air Conditioner
