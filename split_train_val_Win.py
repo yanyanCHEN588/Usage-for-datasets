@@ -6,6 +6,9 @@ DATE : 2021-10-12
 
 for Windows
 
+//2022-06-15
+新增一些註解為了保持兩邊同樣分布
+
 """
 #%%
 import os
@@ -15,7 +18,7 @@ import xml.etree.ElementTree as ET
 from pathlib import Path
 
 
-#%%
+#%%setting path
 os.chdir(os.path.dirname(__file__))
 parser = argparse.ArgumentParser()
 
@@ -28,6 +31,7 @@ trainval_percent = 1.0
 train_percent = 0.9
 xmlfilepath = 'labels'
 txtsavepath = 'ImageSets/Main'
+#%% split
 total_xml = os.listdir(xmlfilepath)
 if not os.path.exists(txtsavepath):
     os.makedirs(txtsavepath)
@@ -59,7 +63,7 @@ file_trainval.close()
 file_train.close()
 file_val.close()
 file_test.close()
-#%%
+#%% for create path
 
 sets = ['train', 'val']
 FILE = Path(__file__).absolute()
@@ -67,7 +71,7 @@ abs_path=FILE.parents[0].as_posix()
 for image_set in sets:
     if not os.path.exists('labels'):
         os.makedirs('labels')
-    image_ids = open('ImageSets/Main/%s.txt' % (image_set)).read().strip().split()
+    image_ids = open('ImageSets/Main1/%s.txt' % (image_set)).read().strip().split()
     list_file = open('%s.txt' % (image_set), 'w')
     for image_id in image_ids:
         list_file.write(abs_path + '/images/%s.jpg\n' % (image_id))
