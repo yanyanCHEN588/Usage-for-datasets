@@ -1,9 +1,9 @@
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000154.jpg
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000285.jpg
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000658.jpg
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000824.jpg
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000665.jpg
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000535.jpg
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000401.jpg
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000777.jpg
-D:/yan/Object Detection/datasets/test_cal_label/images/objects365_v1_00000826.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000154.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000285.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000658.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000824.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000571.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000258.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000692.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000852.jpg
+e:/с쮛⒡턨プ/code/Usage-for-datasets/test_cal_label/images/objects365_v1_00000826.jpg

@@ -1,0 +1,17 @@
+0 : Umbrella
+6 : Bag
+0 : Bottle
+4 : Cup
+1 : Fork
+0 : Spoon
+0 : Bowl
+48 : Chair
+0 : Remote
+0 : Cell Phone
+1 : Microwave
+2 : Refrigerator
+0 : Extension-block
+21 : Moniter
+0 : Mouse
+0 : Keyboard
+1 : Air Conditioner

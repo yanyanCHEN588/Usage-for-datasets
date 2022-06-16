@@ -36,6 +36,20 @@ classes.txt
 txtsavepath = 'ImageSets/Main'
 
 
+##0616改
+因為為了要系統性的家東西所以要歸類名稱
+所有產生的東西盡量前面都有名稱如:o12v1_Main1
+setName="o12v1_Main4"
+
+
+//0616v2
+要做一個可以在ClassSets內中知道空標註檔案在哪裡影像有多少個
+影該也要在這裡當成訓練資料
+我有模擬none01.txt、none02.txt
+不然以前都沒有空標註當訓練資料有點可惜
+
+在此是成功弄好了，但是想想覺得好像優勢不大所以還是止步於此
+
 """
 
 
@@ -59,9 +73,11 @@ classFile ='classes.txt'
 
 datasoure="/obj365"
 
-eachClassSavePath = 'ClassSets/Main3'
+setName="o12v1_Main6"
 
-txtsavepath = 'ImageSets/Main3'
+eachClassSavePath = 'ClassSets/'+setName
+
+txtsavepath = 'ImageSets/'+setName
 
 classList=np.array([])
 with open(classFile, "r") as f:
@@ -91,7 +107,7 @@ InstanceClass=np.zeros(len(classList)-1)
 利用這裡儲存的list去創立最後的txtfile ，也可以利用這裡做train/val分割
 """
 
-for i in range(len(classList)-1):
+for i in range(len(classList)):
     globals() ['classFile'+str(i)]=[]
 #%%Definde for calculate each label instance
 def classCounter(classLen):
@@ -110,6 +126,7 @@ for annoFile in labelfilepath.iterdir():
         annoData = f.read().split('\n')[:-1] #不要最後的空行
         # print(annoData) #all anno saved as list
 
+    # print(annoFile) #check where error
     #getting Label ID from each anno
     annoCounter=np.zeros(len(classList)-1)
     for data in annoData:
@@ -120,15 +137,20 @@ for annoFile in labelfilepath.iterdir():
     InstanceClass += annoCounter
     #where counter > 0
     recodeFileIndex=np.where(annoCounter>0)
-
+    
 
     for index in recodeFileIndex[0]:
         globals() ['classFile'+str(index)].append(annoFile.stem) #stem 是Path中把.txt弄掉 純名稱
+    
+    #record noneLabel
+    if(np.sum(annoCounter)==0):
+        globals() ['classFile'+str(len(classList)-1)].append(annoFile.stem) #stem 是Path中把.txt弄掉 純名稱
+
 
 
 #%%Create file
 
-with open("InstanceClass.txt","w") as f:
+with open(setName+"_InstanceClass.txt","w") as f:
     for i in range(len(InstanceClass)):
         f.write(str(int(InstanceClass[i])))
         f.write(' : ')
@@ -142,7 +164,7 @@ with open("InstanceClass.txt","w") as f:
 等到多資料源時其實沒有什麼意義了QQ
 """
 ##can comment
-for tag in range(len(classList)-1):
+for tag in range(len(classList)):
 
     FileName = eachClassSavePath+datasoure+"_"+classList[tag]+"_"+str(len(globals() ['classFile'+str(tag)]))+".txt"
 
@@ -195,6 +217,15 @@ for tag in sortIndex: #少至多的順序
                     
     count+=1
 
+
+##noneLabelFile to train(only train)
+num = len(globals() ['classFile'+str(len(classList)-1)]) 
+listIndex = range(num) #(0,n)
+# trinNum = int(num * train_percent)
+# trainIndex = random.sample(listIndex, trinNum)
+
+for i in listIndex:
+    file_train.append(globals() ['classFile'+str(len(classList)-1)][i])
 
 
 
