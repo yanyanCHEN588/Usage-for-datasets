@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
 2022-03-29
+
+windoiw / linux 都可以用!!!
 @author: yan
 
 2022-03-31 修改算影像張數 
@@ -61,9 +63,9 @@ filterpath=Path(os.path.dirname(__file__))
 
 classFile ='classes.txt'
 
-datasoure="/obj365"
+datasoure="/coco"
 
-setName="o12v1_Main2"
+setName="o12v1_Main3"
 
 eachClassSavePath = 'ClassSets/'+setName
 
