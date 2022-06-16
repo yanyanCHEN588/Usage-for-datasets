@@ -36,6 +36,10 @@ classes.txt
 txtsavepath = 'ImageSets/Main'
 
 
+##0616改
+因為為了要系統性的家東西所以要歸類名稱
+所有產生的東西盡量前面都有名稱如:o12v1_Main1
+
 """
 
 
@@ -59,9 +63,11 @@ classFile ='classes.txt'
 
 datasoure="/obj365"
 
-eachClassSavePath = 'ClassSets/Main3'
+setName="o12v1_Main2"
 
-txtsavepath = 'ImageSets/Main3'
+eachClassSavePath = 'ClassSets/'+setName
+
+txtsavepath = 'ImageSets/'+setName
 
 classList=np.array([])
 with open(classFile, "r") as f:
@@ -110,6 +116,7 @@ for annoFile in labelfilepath.iterdir():
         annoData = f.read().split('\n')[:-1] #不要最後的空行
         # print(annoData) #all anno saved as list
 
+    # print(annoFile) #check where error
     #getting Label ID from each anno
     annoCounter=np.zeros(len(classList)-1)
     for data in annoData:
@@ -128,7 +135,7 @@ for annoFile in labelfilepath.iterdir():
 
 #%%Create file
 
-with open("InstanceClass.txt","w") as f:
+with open(setName+"_InstanceClass.txt","w") as f:
     for i in range(len(InstanceClass)):
         f.write(str(int(InstanceClass[i])))
         f.write(' : ')
