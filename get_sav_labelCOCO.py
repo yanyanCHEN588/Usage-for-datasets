@@ -29,7 +29,8 @@
     cls_id=coco.getCatIds(catNms=[cls])
     img_ids=coco.getImgIds(catIds=cls_id) #後面有[:50] eg:取前50張
 
-
+#0616
+我預設COCO沒有nosave
 """
 #%% load module
 from pycocotools.coco import COCO
@@ -45,7 +46,7 @@ from pathlib import Path
 #標註名稱轉換表
 import csv
 import numpy as np
-with open('class_id_Customized_office_v2.csv') as csvFile:
+with open('class_id_Customized_o12_v1.csv') as csvFile:
     csvReader = csv.reader(csvFile)
     data = list(csvReader)
 
@@ -58,7 +59,7 @@ for index in data[1:]: #最上面['', 'name', 'AnnsName']不要
 #%%json coco
 ###-----------config----------
 #the path you want to save your results for coco to voc
-savepath="coco_testSAV/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
+savepath="coco_o12_v1/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
 labelformat = 'txt'
 img_dir=savepath+'images/' 
 anno_dir=savepath+'labels/' #++
@@ -66,7 +67,7 @@ anno_dir=savepath+'labels/' #++
 # datasets_list=['patch29','patch30','patch31','patch32','patch33','patch34','patch35', 'patch36','patch37','patch40'] #++
 # datasets_list=['patch0','patch5'] #++
 # classes_names = ["Microwave"]  #coco有80类，这里写要提取类的名字，以person为例 #++
-classes_names = ["tv","mouse","keyboard"]
+classes_names = ["umbrella","handbag","bottle","cup","spoon","bowl","chair","remote","keyboard","microwave","refrigerator"]
 #["Chair","Bottle","Cup","Handbag/Satchel","Backpack","Bowl/Basin","Umbrella","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Desk","Scissors","Fork","Extention Cord"]
 # classes_names = ["Bus","Car"]
 # classes_names = ["Cell Phone"]
@@ -227,19 +228,19 @@ def unique(list1):
             unique_list.append(x)
     return unique_list
 # %%
-#刪除的_不要的清單資料夾
-del_labelDir=Path("del_label")/'object365_o17_v1/'
+# #刪除的_不要的清單資料夾
+# del_labelDir=Path("del_label")/'object365_o17_v1/'
 
-nosave=[] #不要儲存的list
-if del_labelDir.exists(): #存在才執行以下，防呆用
-    for file in Path(del_labelDir).iterdir():
-        with open(file) as f:
-            nosave.extend(f.read().split('\n')[:-1]) #>>>objects365_v1_00000702
+# nosave=[] #不要儲存的list
+# if del_labelDir.exists(): #存在才執行以下，防呆用
+#     for file in Path(del_labelDir).iterdir():
+#         with open(file) as f:
+#             nosave.extend(f.read().split('\n')[:-1]) #>>>objects365_v1_00000702
  
 
 # %%ver_2021.10.11
 #SAV_指定要label的清單
-sav_labelDir=Path("sav_label")/'coco_test/'
+sav_labelDir=Path("sav_label")/'coco_o12_v1/'
 
 annotasave=[] #蒐集SAV儲存label的list
 if sav_labelDir.exists(): #存在才執行以下，防呆用
@@ -296,23 +297,23 @@ for imgId in tqdm(sav_list): #依照全部符合cls的ImgID一張張跑
     # -----for coco
     filename = img['file_name'] # eg: '000000483328.jpg'
 
-    if filename[:-4] not in nosave: #檔名(無副檔名)沒有在不可儲存的清單
+    # if filename[:-4] not in nosave: #檔名(無副檔名)沒有在不可儲存的清單
 
         #---for obj365
         # dataset = filename_list[2] #eg:  'patch45'
         # img_path=dataDir+'images/'+dataset
         #---for coco
-        dataset = 'train2017' #大家都在2017內
-        img_path=dataDir+'images/'+dataset
+    dataset = 'train2017' #大家都在2017內
+    img_path=dataDir+'images/'+dataset
 
 
-        objs=annotations_img(coco, dataset, img, classes,classes_ids,filename)
+    objs=annotations_img(coco, dataset, img, classes,classes_ids,filename)
     # print(objs)
             
 
 # %%建立給labelimg看的檔案
 #create classes.txt
-with open(anno_dir+"classes.txt","w") as file:
+with open(savepath+"classes.txt","w") as file:
     for i in data[1:]: #data[1:]>是全部了
         file.write(f"{i[1]}\n") #i[0]>>cls_id  i[1]>> cls_name
 # %%create ALL file list
@@ -320,7 +321,7 @@ with open(anno_dir+"classes.txt","w") as file:
 #先用照片當用程式自動篩選出來的清單全部
 create_list=[]
 # cls="Bowl"
-cls = "cocoUNSEE_o17_v1"
+cls = "coco_o12_v1"
 for i in Path(img_dir).iterdir():
     create_list.append(i.name)
 savetxt_name="ALL_{}_len_{}.txt".format(cls,len(create_list))

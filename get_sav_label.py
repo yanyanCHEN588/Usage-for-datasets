@@ -17,7 +17,7 @@
 ##要調整得地方
 1.統合ID名單
     class_id_Customized.csv
-2.想要label的類別
+2.想要label的類別# 這裡控制抓Anns內的類別
     classes_names = ["Bus","Car"]
 3.label檔案 txt or xml
     labelformat = 'txt'
@@ -45,7 +45,7 @@ from pathlib import Path
 #標註名稱轉換表
 import csv
 import numpy as np
-with open('class_id_Customized_h15v1.csv') as csvFile:
+with open('class_id_Customized_o12_v1.csv') as csvFile:
     csvReader = csv.reader(csvFile)
     data = list(csvReader)
 
@@ -58,7 +58,7 @@ for index in data[1:]: #最上面['', 'name', 'AnnsName']不要
 #%%json coco
 ###-----------config----------
 #the path you want to save your results for coco to voc
-savepath="object365_c15_v1/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
+savepath="object365_o12_v1/"#"coco_2017_sub1/"  #保存提取类的路径,我放在同一路径下 #++
 labelformat = 'txt'
 img_dir=savepath+'images/' 
 anno_dir=savepath+'labels/' #++
@@ -66,9 +66,10 @@ anno_dir=savepath+'labels/' #++
 # datasets_list=['patch29','patch30','patch31','patch32','patch33','patch34','patch35', 'patch36','patch37','patch40'] #++
 # datasets_list=['patch0','patch5'] #++
 # classes_names = ["Microwave"]  #coco有80类，这里写要提取类的名字，以person为例 #++
-classes_names = ["Chair","Bottle","Cup","Handbag/Satchel","Bowl/Basin","Umbrella","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Desk","Scissors","Fork"]
+classes_names = ["Umbrella","Handbag/Satchel","Backpack","Bottle","Cup","Spoon","Bowl/Basin","Chair","Remote","Keyboard","Microwave","Refrigerator"]
+#["Chair","Bottle","Cup","Handbag/Satchel","Backpack","Bowl/Basin","Umbrella","Cell Phone","Spoon","Remote","Refrigerator","Microwave","Toothbrush","Desk","Scissors","Fork","Extention Cord"]
 # classes_names = ["Bus","Car"]
-# classes_names = ["Person"]
+# classes_names = ["Cell Phone"]
 # classes_names = ["Dinning Table","Coffee Table","Side Table","Tablet"]
 #Store annotations and train2014/val2014/... in this folder
 dataDir= 'Objects365/'  #原coco数据集 #++
@@ -227,7 +228,7 @@ def unique(list1):
     return unique_list
 # %%
 #刪除的_不要的清單資料夾
-del_labelDir=Path("del_label")/'object365_c15_v1/'
+del_labelDir=Path("del_label")/'object365_o12_v1/'
 
 nosave=[] #不要儲存的list
 if del_labelDir.exists(): #存在才執行以下，防呆用
@@ -238,7 +239,7 @@ if del_labelDir.exists(): #存在才執行以下，防呆用
 
 # %%ver_2021.10.11
 #SAV_指定要label的清單
-sav_labelDir=Path("sav_label")/'object365_c15_v1/'
+sav_labelDir=Path("sav_label")/'object365_o12_v1/'
 
 annotasave=[] #蒐集SAV儲存label的list
 if sav_labelDir.exists(): #存在才執行以下，防呆用
@@ -297,7 +298,7 @@ for imgId in tqdm(sav_list): #依照全部符合cls的ImgID一張張跑
 
 # %%建立給labelimg看的檔案
 #create classes.txt
-with open(anno_dir+"classes.txt","w") as file:
+with open(savepath+"classes.txt","w") as file:
     for i in data[1:]:
         file.write(f"{i[1]}\n")
 # %%create ALL file list
@@ -305,7 +306,7 @@ with open(anno_dir+"classes.txt","w") as file:
 #先用照片當用程式自動篩選出來的清單全部
 create_list=[]
 # cls="Bowl"
-cls = "o365h15v1"
+cls = "object365_o12_v1"
 for i in Path(img_dir).iterdir():
     create_list.append(i.name)
 savetxt_name="ALL_{}_len_{}.txt".format(cls,len(create_list))
